@@ -92,14 +92,21 @@ ExecSpiSequence(std::string board_ip, uint32_t chip_select, std::string file_pat
 
 int main(int argc, char* argv[])
 {
-  if(kSizeArg != argc){
-    std::cout << "Usage\n";
-    std::cout << "set_asic_register [ip address] [Register file path] [Mode]" << std::endl;
-    std::cout << "Mode:" << std::endl;
-    std::cout << "- initialize : Execute the ASIC initialization process" << std::endl;
-    std::cout << "- normal     : Change ASIC register setting" << std::endl;
+  const auto print_usage = [&](std::ostream& out) {
+    out << "Usage\n" << argv[0] << " [ip address] [Register file path] [Mode]\n"
+        << "Mode:\n"
+        << "- initialize : Execute the ASIC initialization process\n"
+        << "- normal     : Change ASIC register setting\n";
+  };
+  if (argc == 1 || (argc == 2 && (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h"))) {
+    print_usage(std::cout);
     return 0;
-  }// usage
+  }
+  if (argc != kSizeArg) {
+    std::cerr << "#E: Expected an IP address, register file path, and mode\n";
+    print_usage(std::cerr);
+    return 1;
+  }
   
   // body ------------------------------------------------------
   std::string board_ip     = argv[kIp];

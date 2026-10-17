@@ -1,59 +1,48 @@
 set(FW_NAME TrgFw)
-set(MY_TARGET ${FW_NAME}_daq)
+#set(LIB_NAME FwFuncs)
 
 set(MY_PUB_HEADER
-    "RegisterMap.hh"
-    "MhTdcFuncs.hh"
-    "AdcFuncs.hh"
-    "SelfTriggerConfig.hh"
-)
+  "RegisterMap.hh"
+  "MhTdcFuncs.hh"
+  "AdcFuncs.hh"
+  "TimeWindow.hh"
+  )
 
-set(TRGFW_CONFIG_DIR
-    "${CMAKE_INSTALL_PREFIX}/${FW_NAME}/config"
-)
+foreach(val IN ITEMS
+    daq
+    )
 
-install(FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/self_trig.txt"
-    DESTINATION "${FW_NAME}/config"
-)
+  set(MY_OUTPUT_NAME ${val})  
+  set(MY_TARGET ${FW_NAME}_${val})
+  add_executable(${MY_TARGET}
+    ${MY_OUTPUT_NAME}_main.cc
+    )
 
-add_executable(${MY_TARGET}
-    daq_main.cc
-    DaqOptions.cc
-    DaqSetup.cc
-    SelfTriggerConfig.cc
-    MhTdcFuncs.cc
-    AdcFuncs.cc
-)
+  if(${MYDEBUG})
+    message(STATUS "MY_TARGET @ Common: " ${MY_TARGET})
+  endif()
 
-target_compile_definitions(${MY_TARGET} PRIVATE
-    RAYRAW_CONFIG_DIR="${TRGFW_CONFIG_DIR}"
-)
-
-target_compile_options(${MY_TARGET} PRIVATE
+  target_compile_options(${MY_TARGET} PUBLIC
     ${my_cxx_options}
-)
-
-set_target_properties(${MY_TARGET} PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
-)
-
-target_include_directories(${MY_TARGET} PRIVATE
+    )
+  target_compile_features(${MY_TARGET} PUBLIC
+    ${my_cxx_features}
+    )
+  target_include_directories(${MY_TARGET} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
-)
+    )
+  target_link_libraries(${MY_TARGET} PUBLIC
+    HulCore;
+    )
 
-target_link_libraries(${MY_TARGET} PRIVATE
-    HulCore
-)
-
-set_target_properties(${MY_TARGET} PROPERTIES
-    OUTPUT_NAME daq
+  set_target_properties(${MY_TARGET} PROPERTIES
+    OUTPUT_NAME ${MY_OUTPUT_NAME}
     PUBLIC_HEADER "${MY_PUB_HEADER}"
-)
+    )
 
-install(TARGETS ${MY_TARGET}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/${FW_NAME}/bin
+
+  install(TARGETS ${MY_TARGET}
+    RUNTIME       DESTINATION ${CMAKE_INSTALL_PREFIX}/${FW_NAME}/bin
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/${FW_NAME}/include
-)
+    )
+endforeach()

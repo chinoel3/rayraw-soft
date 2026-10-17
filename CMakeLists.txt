@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.13)
 project(RayrawSoftware)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11)
+  message(FATAL_ERROR "GCC 11 or newer is required")
+endif()
+
 message(STATUS "Project name: " ${PROJECT_NAME})
 
 set(my_cxx_options  "-Wall")
@@ -33,7 +37,8 @@ message(STATUS "CMAKE_EXE_LINKER_FLAGS:    " ${CMAKE_EXE_LINKER_FLAGS} )
 message(STATUS "CMAKE_SHARED_LINKER_FLAGS: " ${CMAKE_SHARED_LINKER_FLAGS} )
 message(STATUS "")
 
-find_package(HulCore REQUIRED)
+find_package(HulCore REQUIRED HINTS
+  "${CMAKE_CURRENT_LIST_DIR}/../../hul-common-lib/install")
 include(CMakePrintHelpers)
 
 if(HulCore_FOUND)

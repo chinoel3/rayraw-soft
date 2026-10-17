@@ -1,22 +1,30 @@
 #ifndef MHTDC_FUNCS_HH
 #define MHTDC_FUNCS_HH
 
-#include <cstdint>
+#include<stdint.h>
 
-namespace HUL
-{
-	class FPGAModule;
-}
+#include"FPGAModule.hh"
+#include"RegisterMap.hh"
+#include"TimeWindow.hh"
 
-namespace HUL::DAQ
-{
-	struct SelfTriggerConfig;
+namespace HUL::DAQ{
 
-	void SetTdcSelfTrigger(const SelfTriggerConfig &config, HUL::FPGAModule &fpga_module);
+  void
+  SetTdcWindow(uint32_t wmax, uint32_t wmin, HUL::FPGAModule& fpga_module)
+  {
+    ValidateTimeWindow(wmax, wmin);
+    using namespace LBUS;
+  
+    static const uint32_t kCMax       = 2047;
+    static const uint32_t kPtrDiffWr = 2;
 
-	bool VerifyTdcSelfTrigger(const SelfTriggerConfig &config, HUL::FPGAModule &fpga_module);
+    uint32_t ptr_ofs  = kCMax - wmax + kPtrDiffWr;
 
-	void SetTdcWindow(std::uint32_t wmax, std::uint32_t wmin, HUL::FPGAModule &fpga_module);
-}
+    fpga_module.WriteModule(TDC::kAddrPtrOfs,  ptr_ofs, 2);
+    fpga_module.WriteModule(TDC::kAddrWindowMax, wmax,  2);
+    fpga_module.WriteModule(TDC::kAddrWindowMin, wmin,  2);
+
+  }
+};
 
 #endif
