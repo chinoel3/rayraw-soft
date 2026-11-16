@@ -6,6 +6,7 @@ set(MY_PUB_HEADER
     "MhTdcFuncs.hh"
     "AdcFuncs.hh"
     "SelfTriggerConfig.hh"
+    "HitMaskConfig.hh"
 )
 
 set(TRGFW_CONFIG_DIR
@@ -14,6 +15,7 @@ set(TRGFW_CONFIG_DIR
 
 install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/self_trig.txt"
+    "${CMAKE_CURRENT_SOURCE_DIR}/hit_mask.txt"
     DESTINATION "${FW_NAME}/config"
 )
 
@@ -22,6 +24,7 @@ add_executable(${MY_TARGET}
     DaqOptions.cc
     DaqSetup.cc
     SelfTriggerConfig.cc
+    HitMaskConfig.cc
     MhTdcFuncs.cc
     AdcFuncs.cc
 )

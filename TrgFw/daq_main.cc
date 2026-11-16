@@ -5,6 +5,7 @@
 #include "DaqOptions.hh"
 #include "DaqSetup.hh"
 #include "FPGAModule.hh"
+#include "HitMaskConfig.hh"
 #include "RegisterMap.hh"
 #include "SelfTriggerConfig.hh"
 #include "UDPRBCP.hh"
@@ -13,12 +14,14 @@ namespace
 {
 	int Run(const HUL::DAQ::DaqOptions &options)
 	{
+		const std::uint32_t hit_mask = HUL::DAQ::LoadHitMaskConfig();
+
 		const HUL::DAQ::SelfTriggerConfig self_trigger_config = HUL::DAQ::LoadSelfTriggerConfig();
 
 		RBCP::UDPRBCP udp_rbcp(options.board_ip, RBCP::gUdpPort, RBCP::DebugMode::kNoDisp);
 		HUL::FPGAModule fpga_module(udp_rbcp);
 
-		HUL::DAQ::ConfigureHardware(fpga_module, options, self_trigger_config);
+		HUL::DAQ::ConfigureHardware(fpga_module, options, self_trigger_config, hit_mask);
 
 		HUL::DAQ::DoTrgDaq(options.board_ip, options.run_no, options.num_event, LBUS::DCT::kAddrDaqGate);
 
