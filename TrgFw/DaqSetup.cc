@@ -16,6 +16,31 @@ namespace HUL::DAQ
 {
     namespace
     {
+        void ConfigureHitMask(HUL::FPGAModule &fpga_module, std::uint32_t mask)
+        {
+            const std::uint32_t addresses[] = {LBUS::TDC::kAddrHitMask, LBUS::ADC::kAddrHitMask};
+            for (const auto base : addresses)
+            {
+                for (std::uint32_t byte = 0; byte < 4; ++byte)
+                {
+                    fpga_module.WriteModule(base + (byte << 16), (mask >> (byte * 8)) & 0xff, 1);
+                }
+            }
+            for (const auto base : addresses)
+            {
+                for (std::uint32_t byte = 0; byte < 4; ++byte)
+                {
+                    const auto address = base + (byte << 16);
+                    const auto expected = (mask >> (byte * 8)) & 0xff;
+                    if (fpga_module.ReadModule(address, 1) != expected)
+                    {
+                        throw std::runtime_error("Hit mask register read-back failed at address " + std::to_string(address));
+                    }
+                }
+            }
+            std::cout << "#D: TDC/ADC hit mask register read-back: OK\n";
+        }
+
         void ConfigureSelfTrigger(HUL::FPGAModule &fpga_module, const SelfTriggerConfig &config)
         {
             SetTdcSelfTrigger(config, fpga_module);
@@ -45,8 +70,9 @@ namespace HUL::DAQ
         }
     }
 
-    void ConfigureHardware(HUL::FPGAModule &fpga_module, const DaqOptions &options, const SelfTriggerConfig &self_trigger_config)
+    void ConfigureHardware(HUL::FPGAModule &fpga_module, const DaqOptions &options, const SelfTriggerConfig &self_trigger_config, std::uint32_t hit_mask)
     {
+        ConfigureHitMask(fpga_module, hit_mask);
         ConfigureSelfTrigger(fpga_module, self_trigger_config);
 
         // Release AdcRo reset

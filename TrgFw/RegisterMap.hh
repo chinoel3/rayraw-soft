@@ -63,6 +63,7 @@ namespace LBUS
 			kAddrSelfHitThreshold  = 0x30400000, // W/R, [5:0] Hit threshold
 			kAddrSelfLatchWindow   = 0x30500000, // W/R, [3:0] valid hit time (×13.3 ns)
 			kAddrSelfGeometryCount = 0x30600000, // W/R, [4:0] number of valid geometry condition
+			kAddrHitMask           = 0x30700000, // W/R, [31,0] channel hit mask (1=suppress)
 			kAddrSelfGeometryBase  = 0x31000000	 // W/R, [15:0][31:0] geometry condition array
 		};
 
@@ -141,6 +142,7 @@ namespace LBUS
 			kAddrAdcRoIsReady  = 0x50400000,	 // R,   [3:0]  AdcRo IsReady signals
 			kAddrEnableZeroSup = 0x50500000,	 // W/R, [0:0]  Enable Zero Suppression
 			kAddrHitTimeout    = 0x50600000,     // W/R, [7:0]  Hit Timeout
+			kAddrHitMask       = 0x50700000,     // W/R, [31,0] Channel hit mask (1=suppress)
 		};
 	};
 
